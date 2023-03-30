@@ -31,12 +31,12 @@
             <property name="nullCatalogMeansCurrent" value="true" />
         </jdbcConnection>
 
-        <javaModelGenerator targetPackage="com.lyl.pojo" targetProject="news-pojo/src/main/java"/>
+        <javaModelGenerator targetPackage="com.lyl.pojo" targetProject="mall-pojo/src/main/java"/>
 
-        <sqlMapGenerator targetPackage="com.lyl.mapper" targetProject="news-mapper/src/main/resources"/>
+        <sqlMapGenerator targetPackage="com.lyl.mapper" targetProject="mall-mapper/src/main/resources"/>
 
         <javaClientGenerator type="XMLMAPPER" targetPackage="com.lyl.mapper"
-                             targetProject="news-mapper/src/main/java"/>
+                             targetProject="mall-mapper/src/main/java"/>
         <table tableName="%">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
