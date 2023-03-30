@@ -1,0 +1,13 @@
+server:
+  port: 8082
+  # localhost:8082
+  # 运行后可以进入eureka管理页
+
+eureka:
+  instance:
+    hostname: eureka-serve
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
