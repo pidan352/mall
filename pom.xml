@@ -13,7 +13,7 @@
         <module>mall-mapper</module>
         <module>mall-eureka</module>
         <module>mall-zuul</module>
-        <module>mall-manager-service</module>
+        <module>mall-good-brand-service</module>
     </modules>
 
 

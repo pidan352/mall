@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mall-manager-service</artifactId>
+    <artifactId>mall-good-brand-service</artifactId>
 
 
 </project>
