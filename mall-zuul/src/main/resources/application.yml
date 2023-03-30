@@ -1,0 +1,19 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka/
+
+server:
+  port: 8082
+
+# 网关路由
+zuul:
+  routes:
+  #可以定义多个路径，路径名：api-*
+    api-brand:
+      path: /brand-ms/**
+      service-id: mall-good-brand-ms
+
+spring:
+  application:
+    name: serve-zuul

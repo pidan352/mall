@@ -28,6 +28,10 @@ public class BrandController {
 
 	@GetMapping("/queryBrandByPage")
 	public PageResp<TbBrand> queryBrandByPage(PageReq pageReq) {
+		if(pageReq.getPage()==0 || pageReq.getSize()==0){
+			pageReq.setPage(1);
+			pageReq.setSize(5);
+		}
 		PageHelper.startPage(pageReq.getPage(), pageReq.getSize());
 		//分页拦截后返回的是Page
 		Page<TbBrand> page = (Page<TbBrand>) brandService.queryBrand();
