@@ -12,6 +12,8 @@
                     :data-source="brandList"
                     :pagination="false"
                     :loading="loading"
+                    class="ant-table-striped"
+                    :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)"
             >
             </a-table>
         </a-layout>
@@ -119,6 +121,8 @@
     });
 </script>
 
-<style>
-
+<style scoped>
+    .ant-table-striped >>> .table-striped td {
+        background-color: #fafafa;
+    }
 </style>
