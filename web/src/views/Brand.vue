@@ -1,13 +1,20 @@
 <template>
     <a-layout style="padding: 24px 24px 24px">
-        <a-table
-                :columns="columns"
-                :row-key="record => record.id"
-                :data-source="brandList"
-                :pagination="false"
-                :loading="loading"
-        >
-        </a-table>
+        <a-layout style="background: #fff;padding: 24px; margin: 0;min-height: 280px">
+            <div>
+                <a-button type="primary" style="margin-right: 6px">添加</a-button>
+                <a-button type="primary" style="margin-right: 6px">删除</a-button>
+                <a-button type="primary" @click="selectBrand">刷新</a-button>
+            </div>
+            <a-table
+                    :columns="columns"
+                    :row-key="record => record.id"
+                    :data-source="brandList"
+                    :pagination="false"
+                    :loading="loading"
+            >
+            </a-table>
+        </a-layout>
         <div style="position: relative;height: 28px">
             <a-pagination style="position: absolute;top: 16px;right: 0px"
                           v-model:current="pagination.current"
