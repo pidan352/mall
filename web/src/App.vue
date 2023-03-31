@@ -1,5 +1,5 @@
 <template>
-    <a-layout id="components-layout-demo-top-side-2">
+    <a-layout>
         <TheHeader/>
         <a-layout>
             <TheLeafMenu/>
@@ -26,9 +26,5 @@
 </script>
 
 <style>
-    #logoinfo {
-        color: white;
-        font-size: 18px;
-    }
 
 </style>

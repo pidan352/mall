@@ -1,58 +1,88 @@
 <template>
     <a-layout-sider width="200" style="background: #fff">
         <a-menu
-                v-model:selectedKeys="selectedKeys2"
-                v-model:openKeys="openKeys"
+                v-model:selectedKeys="selectedKeys"
+                :open-keys="openKeys"
                 mode="inline"
                 :style="{ height: '100%', borderRight: 0 }"
+                @openChange="onOpenChange"
         >
+
             <a-sub-menu key="sub1">
                 <template #title>
-              <span>
-                <user-outlined/>
-                商家管理
-              </span>
+                    <span><user-outlined/>商家管理</span>
                 </template>
                 <a-menu-item key="1">option1</a-menu-item>
                 <a-menu-item key="2">option2</a-menu-item>
                 <a-menu-item key="3">option3</a-menu-item>
                 <a-menu-item key="4">option4</a-menu-item>
             </a-sub-menu>
+
+
             <a-sub-menu key="sub2">
                 <template #title>
-              <span>
-                <laptop-outlined/>
-                商品管理
-              </span>
+                    <span><laptop-outlined/>商品管理</span>
                 </template>
-                <a-menu-item key="5">品牌管理</a-menu-item>
+                <a-menu-item key="5">
+                    <router-link to="/brand">品牌管理</router-link>
+                </a-menu-item>
                 <a-menu-item key="6">规格管理</a-menu-item>
                 <a-menu-item key="7">模板管理</a-menu-item>
                 <a-menu-item key="8">分类管理</a-menu-item>
-                <a-menu-item key="">商品审核</a-menu-item>
+                <a-menu-item key="9">商品审核</a-menu-item>
             </a-sub-menu>
+
+
             <a-sub-menu key="sub3">
                 <template #title>
-              <span>
-                <notification-outlined/>
-                广告管理
-              </span>
+                    <span><notification-outlined/>广告管理</span>
                 </template>
-                <a-menu-item key="9">广告类别</a-menu-item>
-                <a-menu-item key="10">广告内容</a-menu-item>
+                <a-menu-item key="10">广告类别</a-menu-item>
+                <a-menu-item key="11">广告内容</a-menu-item>
             </a-sub-menu>
         </a-menu>
     </a-layout-sider>
 </template>
 
-<script>
-    import {defineComponent} from 'vue';
+<!-- 一定要加lang='ts'，否则不能正确识别ts语法-->
+<script lang="ts">
+    import {defineComponent, reactive, toRefs} from 'vue';
+    import {UserOutlined, LaptopOutlined, NotificationOutlined} from '@ant-design/icons-vue';
 
     export default defineComponent({
         name: 'the-leafmenu',
-    });
+
+        //引入的icon
+        components: {
+            UserOutlined,
+            LaptopOutlined,
+            NotificationOutlined,
+        },
+
+        setup() {
+            //只展开当前父菜单
+            const state = reactive({
+                rootSubmenuKeys: ['sub1', 'sub2', 'sub3'],
+                openKeys: [''],
+                selectedKeys: [],
+            });
+            const onOpenChange = (openKeys: string[]) => {
+                const latestOpenKey = openKeys.find(key => state.openKeys.indexOf(key) === -1);
+                if (state.rootSubmenuKeys.indexOf(latestOpenKey!) === -1) {
+                    state.openKeys = openKeys;
+                } else {
+                    state.openKeys = latestOpenKey ? [latestOpenKey] : [];
+                }
+            };
+
+            return {
+                ...toRefs(state),
+                onOpenChange,
+            };
+        }
+    })
 </script>
 
-<style scoped>
+<style>
 
 </style>

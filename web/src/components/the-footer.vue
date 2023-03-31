@@ -1,5 +1,5 @@
 <template>
-    <a-layout-footer style="text-align: center">
+    <a-layout-footer class="footer">
         分布式商城@2023 Created by Ant UED
     </a-layout-footer>
 </template>
@@ -12,6 +12,8 @@
     });
 </script>
 
-<style scoped>
-
+<style>
+    .footer {
+        text-align: center;
+    }
 </style>
