@@ -2,9 +2,14 @@
     <a-layout style="padding: 24px 24px 24px">
         <a-layout style="background: #fff;padding: 24px; margin: 0;min-height: 280px">
             <div>
+                <a-button type="primary" @click="selectBrand" style="margin-right: 6px">刷新</a-button>
                 <a-button type="primary" style="margin-right: 6px">添加</a-button>
-                <a-button type="primary" style="margin-right: 6px">删除</a-button>
-                <a-button type="primary" @click="selectBrand">刷新</a-button>
+                <a-button type="primary" :disabled="!hasSelected" :loading="loading2" @click="start">删除</a-button>
+                <span style="margin-left: 8px">
+                    <template v-if="hasSelected">
+                      {{ `共 ${selectedRowKeys.length} 条` }}
+                    </template>
+                </span>
             </div>
             <a-table
                     :columns="columns"
@@ -14,6 +19,7 @@
                     :loading="loading"
                     class="ant-table-striped"
                     :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)"
+                    :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
             >
             </a-table>
         </a-layout>
@@ -33,7 +39,7 @@
 
 <script lang="ts">
     import axios from "axios";
-    import {defineComponent, ref, onMounted} from 'vue';
+    import {defineComponent, ref, onMounted, computed, reactive, toRefs} from 'vue';
     import {message} from 'ant-design-vue';
 
 
@@ -64,10 +70,43 @@
         }
     ]
 
+
     //数据加载标志
     const loading = ref(false);
 
+
+    //分页大小自定义数据
     const pageSizeOptions = ['5', '10', '15', '20']
+
+
+    //复选框参数
+    type Key = string | number;
+
+    interface DataType {
+        key: Key;
+        id: number;
+        name: string;
+        firstChar: string;
+    }
+
+    interface brand {
+        id: number;
+        name: string;
+        firstChar: string;
+    }
+
+    const data: DataType[] = [];
+    //使用序列化的方法将其转化为数组类型
+    const brandArray: [brand] = JSON.parse(JSON.stringify(brandList));
+    for (let i = 0; i < brandArray.length; i++) {
+        data.push({
+            key: i,
+            id: brandArray[i].id,
+            name: brandArray[i].name,
+            firstChar: brandArray[i].firstChar,
+        });
+    }
+
 
     export default defineComponent({
         name: 'Brand',
@@ -92,6 +131,7 @@
                 })
             }
 
+
             //页面初始化
             onMounted(() => {
                 selectBrand({
@@ -99,6 +139,7 @@
                     size: pagination.value.pageSize
                 })
             })
+
 
             //分页、排序、筛选变化时触发
             const handleTableChange = (current: number, pageSize: number) => {
@@ -108,6 +149,26 @@
                 })
             }
 
+
+            //复选框
+            const state = reactive<{ selectedRowKeys: Key[]; loading2: boolean; }>({
+                selectedRowKeys: [],
+                loading2: false,
+            });
+            const hasSelected = computed(() => state.selectedRowKeys.length > 0);
+            const start = () => {
+                state.loading2 = true;
+                // ajax request after empty completing
+                setTimeout(() => {
+                    state.loading2 = false;
+                    state.selectedRowKeys = [];
+                }, 1000);
+            };
+            const onSelectChange = (selectedRowKeys: Key[]) => {
+                console.log('selectedRowKeys changed: ', selectedRowKeys);
+                state.selectedRowKeys = selectedRowKeys;
+            };
+
             return {
                 brandList,
                 pagination,
@@ -116,6 +177,11 @@
                 selectBrand,
                 handleTableChange,
                 pageSizeOptions,
+                data,
+                hasSelected,
+                ...toRefs(state),
+                start,
+                onSelectChange,
             };
         },
     });
