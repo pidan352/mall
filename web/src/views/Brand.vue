@@ -14,7 +14,7 @@
             <a-table
                     :columns="columns"
                     :row-key="record => record.id"
-                    :data-source="brandList"
+                    :data-source="data"
                     :pagination="false"
                     :loading="loading"
                     class="ant-table-striped"
@@ -42,10 +42,8 @@
     import {defineComponent, ref, onMounted, computed, reactive, toRefs} from 'vue';
     import {message} from 'ant-design-vue';
 
-
     //定义数据，双向绑定需要用ref
     //table参数
-    const brandList = ref();
     const pagination = ref({
         current: 1,
         pageSize: 5,
@@ -74,13 +72,31 @@
     //数据加载标志
     const loading = ref(false);
 
-
     //分页大小自定义数据
     const pageSizeOptions = ['5', '10', '15', '20']
 
 
+    //复选框参数
+    type Key = string | number;
+
+    interface DataType {
+        key: Key;
+        id: number;
+        name: string;
+        firstChar: string;
+    }
+
+    interface brand {
+        id: number;
+        name: string;
+        firstChar: string;
+    }
+
+    const data = ref()
+
     export default defineComponent({
         name: 'Brand',
+
 
         setup: function () {
             //数据查询
@@ -94,7 +110,21 @@
                     }
                 }).then((response) => {
                     loading.value = false
-                    brandList.value = response.data.list;
+
+                    //使用了复选框，重装了表格的数据。删除了brandList
+                    const brandArray = response.data.list;
+                    const dataSource: DataType[] = []
+                    for (let i = 0; i < brandArray.length; i++) {
+                        dataSource.push({
+                            //商品在数据库的id作为复选框的行标志
+                            key: brandArray[i].id,
+                            //因为每次只查五条数据，所以需要计算编号
+                            id: (pagination.value.current - 1) * pagination.value.pageSize + i + 1,
+                            name: brandArray[i].name,
+                            firstChar: brandArray[i].firstChar,
+                        });
+                    }
+                    data.value = dataSource
 
                     //重置分页按钮
                     pagination.value.current = params.page
@@ -121,56 +151,37 @@
             }
 
 
-            //复选框参数
-            type Key = string | number;
-
-            interface DataType {
-                key: Key;
-                id: number;
-                name: string;
-                firstChar: string;
-            }
-
-            interface brand {
-                id: number;
-                name: string;
-                firstChar: string;
-            }
-
-            const data: DataType[] = [];
-            //使用序列化的方法将其转化为数组类型
-            const brandArray: [brand] = JSON.parse(JSON.stringify(brandList));
-            for (let i = 0; i < brandArray.length; i++) {
-                data.push({
-                    key: i,
-                    id: brandArray[i].id,
-                    name: brandArray[i].name,
-                    firstChar: brandArray[i].firstChar,
-                });
-            }
-
             //复选框
             //reactive定义:接收一个普通对象然后返回该普通对象的响应式代理。等同于 2.x 的 Vue.observable()
             const state = reactive<{ selectedRowKeys: Key[]; loading2: boolean; }>({
                 selectedRowKeys: [],
                 loading2: false,
             });
+            //判断是否有选中复选框，无则按钮失效
             const hasSelected = computed(() => state.selectedRowKeys.length > 0);
+            //删除选中行
             const start = () => {
                 state.loading2 = true;
-                // ajax request after empty completing
+
+                //selectedRowKeys是一个Proxy代理对象，使用序列化的方法将其转化为数组类型
+                const idList: [number] = JSON.parse(JSON.stringify(state.selectedRowKeys))
+                axios.post('http://localhost:8082/brand-ms/deleteBrand', idList).then((response) => {
+                    console.log(idList)
+                })
+
+                //删除完毕
                 setTimeout(() => {
                     state.loading2 = false;
                     state.selectedRowKeys = [];
                 }, 1000);
             };
+            //复选框变动触发的函数
             const onSelectChange = (selectedRowKeys: Key[]) => {
-                console.log('selectedRowKeys changed: ', selectedRowKeys);
+                // console.log('selectedRowKeys changed: ', selectedRowKeys);
                 state.selectedRowKeys = selectedRowKeys;
             };
 
             return {
-                brandList,
                 pagination,
                 columns,
                 loading,

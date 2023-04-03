@@ -4,12 +4,16 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.lyl.pojo.PageReq;
 import com.lyl.pojo.PageResp;
+import com.lyl.pojo.RespBean;
 import com.lyl.pojo.TbBrand;
 import com.lyl.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,7 +32,7 @@ public class BrandController {
 
 	@GetMapping("/queryBrandByPage")
 	public PageResp<TbBrand> queryBrandByPage(PageReq pageReq) {
-		if(pageReq.getPage()==0 || pageReq.getSize()==0){
+		if (pageReq.getPage() == 0 || pageReq.getSize() == 0) {
 			pageReq.setPage(1);
 			pageReq.setSize(5);
 		}
@@ -41,5 +45,11 @@ public class BrandController {
 		pageResp.setList(page.getResult());
 
 		return pageResp;
+	}
+
+	@PostMapping("/deleteBrand")
+	public RespBean deleteBrand(@RequestBody ArrayList<Integer> idList) {
+		System.out.println(idList);
+		return RespBean.ok("删除成功");
 	}
 }
