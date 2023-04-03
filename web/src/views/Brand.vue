@@ -150,6 +150,7 @@
             }
 
             //复选框
+            //reactive定义:接收一个普通对象然后返回该普通对象的响应式代理。等同于 2.x 的 Vue.observable()
             const state = reactive<{ selectedRowKeys: Key[]; loading2: boolean; }>({
                 selectedRowKeys: [],
                 loading2: false,
@@ -187,7 +188,11 @@
 </script>
 
 <style scoped>
-    .ant-table-striped >>> .table-striped td {
+    /*
+    文档中使用的深度选择器是':deep'，然后这里提示没有这个选择器，但是网页内容正常，可能是本地的问题。
+    */
+    .ant-table-striped ::v-deep(.table-striped) td {
         background-color: #fafafa;
     }
+
 </style>
