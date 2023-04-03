@@ -19,7 +19,7 @@
                     :loading="loading"
                     class="ant-table-striped"
                     :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)"
-                    :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+                    :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: deleteBefore }"
             >
             </a-table>
         </a-layout>
@@ -135,10 +135,14 @@
 
             //页面初始化
             onMounted(() => {
-                selectBrand({
-                    page: 1,
-                    size: pagination.value.pageSize
-                })
+                //体现一下加载动画
+                loading.value = true;
+                setTimeout(() => {
+                    selectBrand({
+                        page: 1,
+                        size: pagination.value.pageSize
+                    })
+                }, 1000)
             })
 
 
@@ -157,9 +161,12 @@
                 selectedRowKeys: [],
                 loading2: false,
             });
+
             //判断是否有选中复选框，无则按钮失效
             const hasSelected = computed(() => state.selectedRowKeys.length > 0);
+
             //删除选中行
+            //先提示
             const start = () => {
                 state.loading2 = true;
 
