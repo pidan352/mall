@@ -4,12 +4,23 @@
             <div>
                 <a-button type="primary" @click="selectBrand" style="margin-right: 6px">刷新</a-button>
                 <a-button type="primary" style="margin-right: 6px">添加</a-button>
-                <a-button type="primary" :disabled="!hasSelected" :loading="loading2" @click="start">删除</a-button>
-                <span style="margin-left: 8px">
+                <a-popconfirm
+                        v-bind:title="title"
+                        cancelText="取消"
+                        ok-text="确定"
+                        @cancel="cancel"
+                        @confirm="start"
+                >
+                    <template #icon>
+                        <question-circle-outlined style="color: red"/>
+                    </template>
+                    <a-button type="primary" :disabled="!hasSelected" :loading="loading2">删除</a-button>
+                    <span style="margin-left: 8px">
                     <template v-if="hasSelected">
                       {{ `共 ${selectedRowKeys.length} 条` }}
                     </template>
                 </span>
+                </a-popconfirm>
             </div>
             <a-table
                     :columns="columns"
@@ -19,7 +30,7 @@
                     :loading="loading"
                     class="ant-table-striped"
                     :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)"
-                    :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: deleteBefore }"
+                    :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
             >
             </a-table>
         </a-layout>
@@ -41,6 +52,7 @@
     import axios from "axios";
     import {defineComponent, ref, onMounted, computed, reactive, toRefs} from 'vue';
     import {message} from 'ant-design-vue';
+    import {QuestionCircleOutlined} from '@ant-design/icons-vue';
 
     //定义数据，双向绑定需要用ref
     //table参数
@@ -92,10 +104,18 @@
         firstChar: string;
     }
 
+    //表格的数据源
     const data = ref()
+
+    //删除确认框的提示信息
+    const title = ref()
 
     export default defineComponent({
         name: 'Brand',
+
+        components: {
+            QuestionCircleOutlined,
+        },
 
 
         setup: function () {
@@ -166,14 +186,15 @@
             const hasSelected = computed(() => state.selectedRowKeys.length > 0);
 
             //删除选中行
-            //先提示
             const start = () => {
                 state.loading2 = true;
 
                 //selectedRowKeys是一个Proxy代理对象，使用序列化的方法将其转化为数组类型
                 const idList: [number] = JSON.parse(JSON.stringify(state.selectedRowKeys))
                 axios.post('http://localhost:8082/brand-ms/deleteBrand', idList).then((response) => {
-                    console.log(idList)
+                    if (response.data.code === 200) {
+                        message.success(response.data.message)
+                    }
                 })
 
                 //删除完毕
@@ -186,7 +207,14 @@
             const onSelectChange = (selectedRowKeys: Key[]) => {
                 // console.log('selectedRowKeys changed: ', selectedRowKeys);
                 state.selectedRowKeys = selectedRowKeys;
+                title.value = "你确定删除这" + selectedRowKeys.length + "条数据吗？"
             };
+
+
+            //删除动作取消事件
+            const cancel = () => {
+                state.selectedRowKeys = []
+            }
 
             return {
                 pagination,
@@ -200,6 +228,8 @@
                 ...toRefs(state),
                 start,
                 onSelectChange,
+                title,
+                cancel,
             };
         },
     });
