@@ -79,35 +79,6 @@
     const pageSizeOptions = ['5', '10', '15', '20']
 
 
-    //复选框参数
-    type Key = string | number;
-
-    interface DataType {
-        key: Key;
-        id: number;
-        name: string;
-        firstChar: string;
-    }
-
-    interface brand {
-        id: number;
-        name: string;
-        firstChar: string;
-    }
-
-    const data: DataType[] = [];
-    //使用序列化的方法将其转化为数组类型
-    const brandArray: [brand] = JSON.parse(JSON.stringify(brandList));
-    for (let i = 0; i < brandArray.length; i++) {
-        data.push({
-            key: i,
-            id: brandArray[i].id,
-            name: brandArray[i].name,
-            firstChar: brandArray[i].firstChar,
-        });
-    }
-
-
     export default defineComponent({
         name: 'Brand',
 
@@ -149,6 +120,34 @@
                 })
             }
 
+
+            //复选框参数
+            type Key = string | number;
+
+            interface DataType {
+                key: Key;
+                id: number;
+                name: string;
+                firstChar: string;
+            }
+
+            interface brand {
+                id: number;
+                name: string;
+                firstChar: string;
+            }
+
+            const data: DataType[] = [];
+            //使用序列化的方法将其转化为数组类型
+            const brandArray: [brand] = JSON.parse(JSON.stringify(brandList));
+            for (let i = 0; i < brandArray.length; i++) {
+                data.push({
+                    key: i,
+                    id: brandArray[i].id,
+                    name: brandArray[i].name,
+                    firstChar: brandArray[i].firstChar,
+                });
+            }
 
             //复选框
             const state = reactive<{ selectedRowKeys: Key[]; loading2: boolean; }>({
