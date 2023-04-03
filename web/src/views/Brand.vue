@@ -111,7 +111,7 @@
                 }).then((response) => {
                     loading.value = false
 
-                    //使用了复选框，重装了表格的数据。删除了brandList
+                    //使用了复选框，重装表格的数据。删除了brandList
                     const brandArray = response.data.list;
                     const dataSource: DataType[] = []
                     for (let i = 0; i < brandArray.length; i++) {
