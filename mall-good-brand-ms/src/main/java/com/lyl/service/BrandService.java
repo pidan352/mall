@@ -3,6 +3,7 @@ package com.lyl.service;
 
 import com.lyl.pojo.TbBrand;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,4 +21,11 @@ public interface BrandService {
 	 * @return
 	 */
 	List<TbBrand> queryBrand();
+
+	/**
+	 * 根据id批量删除
+	 *
+	 * @param idList
+	 */
+	void deleteByIdList(ArrayList<Long> idList);
 }

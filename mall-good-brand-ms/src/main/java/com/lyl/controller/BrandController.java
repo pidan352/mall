@@ -31,25 +31,35 @@ public class BrandController {
 	private BrandService brandService;
 
 	@GetMapping("/queryBrandByPage")
-	public PageResp<TbBrand> queryBrandByPage(PageReq pageReq) {
-		if (pageReq.getPage() == 0 || pageReq.getSize() == 0) {
-			pageReq.setPage(1);
-			pageReq.setSize(5);
+	public RespBean queryBrandByPage(PageReq pageReq) {
+		try {
+			if (pageReq.getPage() == 0 || pageReq.getSize() == 0) {
+				pageReq.setPage(1);
+				pageReq.setSize(5);
+			}
+			PageHelper.startPage(pageReq.getPage(), pageReq.getSize());
+			//分页拦截后返回的是Page
+			Page<TbBrand> page = (Page<TbBrand>) brandService.queryBrand();
+
+			PageResp<TbBrand> pageResp = new PageResp<>();
+			pageResp.setTotal(page.getTotal());
+			pageResp.setList(page.getResult());
+
+			return RespBean.ok("查询成功", pageResp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return RespBean.fail("数据查询出错");
 		}
-		PageHelper.startPage(pageReq.getPage(), pageReq.getSize());
-		//分页拦截后返回的是Page
-		Page<TbBrand> page = (Page<TbBrand>) brandService.queryBrand();
-
-		PageResp<TbBrand> pageResp = new PageResp<>();
-		pageResp.setTotal(page.getTotal());
-		pageResp.setList(page.getResult());
-
-		return pageResp;
 	}
 
 	@PostMapping("/deleteBrand")
-	public RespBean deleteBrand(@RequestBody ArrayList<Integer> idList) {
-		System.out.println(idList);
-		return RespBean.ok("删除成功");
+	public RespBean deleteBrand(@RequestBody ArrayList<Long> idList) {
+		try {
+			brandService.deleteByIdList(idList);
+			return RespBean.ok("删除成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return RespBean.fail("删除失败");
+		}
 	}
 }

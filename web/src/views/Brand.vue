@@ -24,13 +24,13 @@
             </div>
             <a-table
                     :columns="columns"
-                    :row-key="record => record.id"
                     :data-source="data"
                     :pagination="false"
                     :loading="loading"
                     class="ant-table-striped"
                     :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)"
                     :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+                    :locale="{emptyText:errormessage}"
             >
             </a-table>
         </a-layout>
@@ -64,7 +64,7 @@
     const columns = [
         {
             title: '编号',
-            //列数据在数据项中对应的路径，支持通过数组查询嵌套路径
+            //列数据在数据项中对应的路径，支持通过数组查询嵌套路径。有了dataIndex可以将key忽略
             dataIndex: 'id',
             width: '20%'
         },
@@ -105,10 +105,18 @@
     }
 
     //表格的数据源
+    /*
+    在 Table 中，dataSource 和 columns 里的数据值都需要指定 key 值。对于 dataSource 默认将每列数据的 key
+    属性作为唯一的标识。如果你的数据没有这个属性，务必使用 rowKey 来指定数据列的主键。若没有指定，控制台会出现缺
+    少 key 的提示，表格组件也会出现各类奇怪的错误。
+     */
     const data = ref()
 
     //删除确认框的提示信息
     const title = ref()
+
+    //错误信息
+    const errormessage = ref()
 
     export default defineComponent({
         name: 'Brand',
@@ -130,25 +138,36 @@
                     }
                 }).then((response) => {
                     loading.value = false
+                    if (response.data.code === 200) {
+                        //使用了复选框，重装表格的数据。删除了brandList
+                        const brandArray = response.data.data.list;
+                        if (brandArray.length == 0) {
+                            //数据库无数据
+                            errormessage.value = "无数据"
+                            //将之前存储的数据清空，否则删除最后剩下的数据时数据库数据已删除，但页面数据还在
+                            data.value = null
+                        } else {
+                            const dataSource: DataType[] = []
+                            for (let i = 0; i < brandArray.length; i++) {
+                                dataSource.push({
+                                    //商品在数据库的id作为复选框的行标志
+                                    key: brandArray[i].id,
+                                    //因为每次只查五条数据，所以需要计算编号
+                                    id: (pagination.value.current - 1) * pagination.value.pageSize + i + 1,
+                                    name: brandArray[i].name,
+                                    firstChar: brandArray[i].firstChar,
+                                });
+                            }
+                            data.value = dataSource
 
-                    //使用了复选框，重装表格的数据。删除了brandList
-                    const brandArray = response.data.list;
-                    const dataSource: DataType[] = []
-                    for (let i = 0; i < brandArray.length; i++) {
-                        dataSource.push({
-                            //商品在数据库的id作为复选框的行标志
-                            key: brandArray[i].id,
-                            //因为每次只查五条数据，所以需要计算编号
-                            id: (pagination.value.current - 1) * pagination.value.pageSize + i + 1,
-                            name: brandArray[i].name,
-                            firstChar: brandArray[i].firstChar,
-                        });
+                            //重置分页按钮
+                            pagination.value.current = params.page
+                            pagination.value.total = response.data.data.total
+                        }
+                    } else {
+                        errormessage.value = response.data.message
                     }
-                    data.value = dataSource
 
-                    //重置分页按钮
-                    pagination.value.current = params.page
-                    pagination.value.total = response.data.total
                 })
             }
 
@@ -193,15 +212,20 @@
                 const idList: [number] = JSON.parse(JSON.stringify(state.selectedRowKeys))
                 axios.post('http://localhost:8082/brand-ms/deleteBrand', idList).then((response) => {
                     if (response.data.code === 200) {
+                        //删除完毕
+                        setTimeout(() => {
+                            state.loading2 = false;
+                            state.selectedRowKeys = [];
+                            selectBrand({
+                                page: 1,
+                                size: pagination.value.pageSize
+                            })
+                        }, 1000);
                         message.success(response.data.message)
+                    } else {
+                        message.error(response.data.message)
                     }
                 })
-
-                //删除完毕
-                setTimeout(() => {
-                    state.loading2 = false;
-                    state.selectedRowKeys = [];
-                }, 1000);
             };
             //复选框变动触发的函数
             const onSelectChange = (selectedRowKeys: Key[]) => {
@@ -230,6 +254,7 @@
                 onSelectChange,
                 title,
                 cancel,
+                errormessage,
             };
         },
     });

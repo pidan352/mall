@@ -10,6 +10,8 @@ import com.lyl.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,8 +25,18 @@ import java.util.List;
 @Service
 public class BrandServiceImpl implements BrandService {
 
-	@Autowired
+	@Resource
 	private TbBrandMapper brandMapper;
+
+	/**
+	 * 根据id批量删除
+	 *
+	 * @param idList
+	 */
+	@Override
+	public void deleteByIdList(ArrayList<Long> idList) {
+		idList.forEach(id->brandMapper.deleteByPrimaryKey(id));
+	}
 
 	/**
 	 * 查询所有数据，查询分页数据使用分页拦截后查询
