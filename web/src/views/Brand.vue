@@ -2,8 +2,16 @@
     <a-layout style="padding: 24px 24px 24px">
         <a-layout style="background: #fff;padding: 24px; margin: 0;min-height: 280px">
             <div>
-                <a-button type="primary" @click="selectBrand" style="margin-right: 6px">刷新</a-button>
+                <a-button type="primary"
+                          @click="selectBrand({
+                            page: 1,
+                            size: pagination.pageSize
+                          })"
+                          style="margin-right: 6px">刷新
+                </a-button>
+
                 <a-button type="primary" style="margin-right: 6px">添加</a-button>
+
                 <a-popconfirm
                         v-bind:title="title"
                         cancelText="取消"
@@ -153,7 +161,7 @@
                                     //商品在数据库的id作为复选框的行标志
                                     key: brandArray[i].id,
                                     //因为每次只查五条数据，所以需要计算编号
-                                    id: (pagination.value.current - 1) * pagination.value.pageSize + i + 1,
+                                    id: (params.page - 1) * params.size + i + 1,
                                     name: brandArray[i].name,
                                     firstChar: brandArray[i].firstChar,
                                 });
