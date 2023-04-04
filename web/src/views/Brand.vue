@@ -10,7 +10,7 @@
                           style="margin-right: 6px">刷新
                 </a-button>
 
-                <a-button type="primary" style="margin-right: 6px">添加</a-button>
+                <a-button type="primary" style="margin-right: 6px" @click="showModal">添加</a-button>
 
                 <a-popconfirm
                         v-bind:title="title"
@@ -30,6 +30,7 @@
                 </span>
                 </a-popconfirm>
             </div>
+
             <a-table
                     :columns="columns"
                     :data-source="data"
@@ -42,6 +43,7 @@
             >
             </a-table>
         </a-layout>
+
         <div style="position: relative;height: 28px">
             <a-pagination style="position: absolute;top: 16px;right: 0px"
                           v-model:current="pagination.current"
@@ -54,13 +56,39 @@
             />
         </div>
     </a-layout>
+
+
+    <!-- 弹出的添加对话框 -->
+    <a-modal
+            v-model:visible="visible"
+            title="添加品牌"
+            :confirm-loading="confirmLoading"
+            @ok="handleOk"
+            cancel-text="取消"
+            ok-text="添加"
+    >
+        <a-form layout="vertical" name="form_in_modal" v-model:model="brandObject" ref="formRef">
+            <a-form-item
+                    name="name"
+                    label="品牌名"
+                    :rules="[{ required: true, message: '请输入品牌名' }]"
+                    required="true"
+            >
+                <a-input v-model:value="brandObject.name"/>
+            </a-form-item>
+            <a-form-item name="firstChar" label="品牌名首字母" required="ture">
+                <a-input v-model:value="brandObject.firstChar"/>
+            </a-form-item>
+        </a-form>
+    </a-modal>
 </template>
 
 <script lang="ts">
     import axios from "axios";
-    import {defineComponent, ref, onMounted, computed, reactive, toRefs} from 'vue';
+    import {defineComponent, ref, onMounted, computed, reactive, toRefs, toRaw} from 'vue';
     import {message} from 'ant-design-vue';
     import {QuestionCircleOutlined} from '@ant-design/icons-vue';
+    import type {FormInstance} from 'ant-design-vue';
 
     //定义数据，双向绑定需要用ref
     //table参数
@@ -107,7 +135,8 @@
     }
 
     interface brand {
-        id: number;
+        //表示可以不用赋初值
+        id?: number;
         name: string;
         firstChar: string;
     }
@@ -125,6 +154,16 @@
 
     //错误信息
     const errormessage = ref()
+
+    //添加品牌窗口的参数
+    const visible = ref<boolean>(false);
+    const confirmLoading = ref<boolean>(false);
+    const formRef = ref<FormInstance>();
+    //表单品牌对象
+    const brandObject = reactive<brand>({
+        name: "",
+        firstChar: ""
+    })
 
     export default defineComponent({
         name: 'Brand',
@@ -201,7 +240,6 @@
                 })
             }
 
-
             //复选框
             //reactive定义:接收一个普通对象然后返回该普通对象的响应式代理。等同于 2.x 的 Vue.observable()
             const state = reactive<{ selectedRowKeys: Key[]; loading2: boolean; }>({
@@ -248,6 +286,34 @@
                 state.selectedRowKeys = []
             }
 
+
+            //弹出添加的窗口
+            const showModal = () => {
+                visible.value = true;
+            };
+
+            //TODO 添加表单
+            //添加窗口的确认事件
+            const handleOk = () => {
+
+                confirmLoading.value = true;
+                axios.post('http://localhost:8082/brand-ms/deleteBrand/addBrand', brandObject).then((res) => {
+                    setTimeout(() => {
+                        if (res.data.code === 200) {
+                            message.success(res.data.message)
+                            selectBrand({
+                                page: 1,
+                                size: pagination.value.pageSize
+                            })
+                        } else {
+                            message.error(res.data.message)
+                        }
+                    }, 1000)
+                    confirmLoading.value = false
+                    visible.value = false
+                })
+            };
+
             return {
                 pagination,
                 columns,
@@ -263,6 +329,12 @@
                 title,
                 cancel,
                 errormessage,
+                visible,
+                confirmLoading,
+                showModal,
+                handleOk,
+                brandObject,
+                formRef,
             };
         },
     });
