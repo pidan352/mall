@@ -41,6 +41,38 @@
                     :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
                     :locale="{emptyText:errormessage}"
             >
+                <template #bodyCell="{ column, text, record }">
+                    <template v-if="['name', 'firstChar'].includes(column.dataIndex)">
+                        <div>
+                            <a-input
+                                    v-if="editableData[record.key]"
+                                    v-model:value="editableData[record.key][column.dataIndex]"
+                                    style="margin: -5px 0"
+                            />
+                            <template v-else>
+                                {{ text }}
+                            </template>
+                        </div>
+                    </template>
+
+                    <template v-else-if="column.dataIndex === 'operation'">
+                        <div class="editable-row-operations">
+                            <span v-if="editableData[record.key]">
+                                 <a-typography-link @click="save(record.key)">保存</a-typography-link>
+                                <a-popconfirm title="确定取消吗?"
+                                              @confirm="cancelEdit(record.key)"
+                                              ok-text="确定"
+                                              cancel-text="取消"
+                                >
+                                  <a>取消</a>
+                                </a-popconfirm>
+                            </span>
+                            <span v-else>
+                                <a @click="edit(record.key)">编辑</a>
+                            </span>
+                        </div>
+                    </template>
+                </template>
             </a-table>
         </a-layout>
 
@@ -90,6 +122,8 @@
     import {message} from 'ant-design-vue';
     import {QuestionCircleOutlined} from '@ant-design/icons-vue';
     import type {FormInstance} from 'ant-design-vue';
+    import type {UnwrapRef} from 'vue';
+    import {cloneDeep} from 'lodash-es';
 
     //定义数据，双向绑定需要用ref
     //table参数
@@ -113,8 +147,13 @@
         {
             title: '品牌首字母',
             dataIndex: 'firstChar',
-            width: '30%'
-        }
+            width: '10%'
+        },
+        {
+            title: '操作',
+            dataIndex: 'operation',
+            width: '20%'
+        },
     ]
 
 
@@ -165,6 +204,11 @@
         name: "",
         firstChar: ""
     })
+
+
+    //编辑表格单元行参数
+    //编辑时复制一份数据
+    const editableData: UnwrapRef<Record<string, brand>> = reactive({});
 
     export default defineComponent({
         name: 'Brand',
@@ -320,6 +364,32 @@
                     })
             };
 
+
+            //编辑
+            const edit = (key: string) => {
+                //拷贝一份数据用作编辑
+                editableData[key] = cloneDeep(data.value.filter((item: { key: string; }) => key === item.key)[0]);
+            };
+
+            //因为385行需要在请求完成之后执行所以需要将axios请求改为同步（默认是异步）,只需将请求使用await修饰并将
+            //请求所在的函数用async修饰即可
+            const save = async (key: string) => {
+                await axios.post("http://localhost:8082/brand-ms/editBrand", editableData[key])
+                    .then((res) => {
+                        if (res.data.code === 200) {
+                            //编辑成功，将编辑后的数据合并到源数据中
+                            Object.assign(data.value.filter((item: { key: string; }) => key === item.key)[0], editableData[key]);
+                        } else {
+                            message.error(res.data.message)
+                        }
+                    })
+                delete editableData[key];
+            };
+
+            const cancelEdit = (key: string) => {
+                delete editableData[key];
+            };
+
             return {
                 pagination,
                 columns,
@@ -341,6 +411,11 @@
                 handleOk,
                 brandObject,
                 formRef,
+                editingKey: '',
+                editableData,
+                edit,
+                save,
+                cancelEdit,
             };
         },
     });
@@ -352,6 +427,10 @@
     */
     .ant-table-striped ::v-deep(.table-striped) td {
         background-color: #fafafa;
+    }
+
+    .editable-row-operations a {
+        margin-right: 8px;
     }
 
 </style>

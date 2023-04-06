@@ -73,4 +73,15 @@ public class BrandController {
 			return RespBean.fail("添加失败");
 		}
 	}
+
+	@PostMapping("/editBrand")
+	public RespBean editBrand(@RequestBody TbBrand brand) {
+		try {
+			brandService.updateBrand(brand);
+			return RespBean.ok("修改成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return RespBean.fail("修改失败");
+		}
+	}
 }

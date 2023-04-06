@@ -29,6 +29,16 @@ public class BrandServiceImpl implements BrandService {
 	private TbBrandMapper brandMapper;
 
 	/**
+	 * 保存修改的品牌
+	 *
+	 * @param brand
+	 */
+	@Override
+	public void updateBrand(TbBrand brand) {
+		brandMapper.updateByPrimaryKey(brand);
+	}
+
+	/**
 	 * 添加品牌
 	 *
 	 * @param brand

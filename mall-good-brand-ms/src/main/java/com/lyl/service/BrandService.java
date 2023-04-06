@@ -35,4 +35,11 @@ public interface BrandService {
 	 * @param brand
 	 */
 	void addBrand(TbBrand brand);
+
+	/**
+	 * 保存修改的品牌
+	 *
+	 * @param brand
+	 */
+	void updateBrand(TbBrand brand);
 }
