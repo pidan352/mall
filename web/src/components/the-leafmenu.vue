@@ -12,10 +12,8 @@
                 <template #title>
                     <span><user-outlined/>商家管理</span>
                 </template>
-                <a-menu-item key="1">option1</a-menu-item>
-                <a-menu-item key="2">option2</a-menu-item>
-                <a-menu-item key="3">option3</a-menu-item>
-                <a-menu-item key="4">option4</a-menu-item>
+                <a-menu-item key="1">商家审核</a-menu-item>
+                <a-menu-item key="2">商家管理</a-menu-item>
             </a-sub-menu>
 
 
@@ -23,13 +21,13 @@
                 <template #title>
                     <span><laptop-outlined/>商品管理</span>
                 </template>
-                <a-menu-item key="5">
+                <a-menu-item key="3">
                     <router-link to="/brand">品牌管理</router-link>
                 </a-menu-item>
-                <a-menu-item key="6">规格管理</a-menu-item>
-                <a-menu-item key="7">模板管理</a-menu-item>
-                <a-menu-item key="8">分类管理</a-menu-item>
-                <a-menu-item key="9">商品审核</a-menu-item>
+                <a-menu-item key="4">规格管理</a-menu-item>
+                <a-menu-item key="5">模板管理</a-menu-item>
+                <a-menu-item key="6">分类管理</a-menu-item>
+                <a-menu-item key="7">商品审核</a-menu-item>
             </a-sub-menu>
 
 
@@ -37,8 +35,8 @@
                 <template #title>
                     <span><notification-outlined/>广告管理</span>
                 </template>
-                <a-menu-item key="10">广告类别</a-menu-item>
-                <a-menu-item key="11">广告内容</a-menu-item>
+                <a-menu-item key="8">广告类别</a-menu-item>
+                <a-menu-item key="9">广告内容</a-menu-item>
             </a-sub-menu>
         </a-menu>
     </a-layout-sider>
