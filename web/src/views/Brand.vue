@@ -76,7 +76,8 @@
             >
                 <a-input v-model:value="brandObject.name"/>
             </a-form-item>
-            <a-form-item name="firstChar" label="品牌名首字母" required="ture">
+            <a-form-item name="firstChar" label="品牌名首字母"
+                         :rules="[{required:true,message:'请输入品牌首写字母'}]">
                 <a-input v-model:value="brandObject.firstChar"/>
             </a-form-item>
         </a-form>
@@ -292,26 +293,31 @@
                 visible.value = true;
             };
 
-            //TODO 添加表单
             //添加窗口的确认事件
             const handleOk = () => {
+                //表单校验
+                formRef.value?.validateFields()
+                    .then(values => {
+                        confirmLoading.value = true;
+                        axios.post('http://localhost:8082/brand-ms/addBrand', brandObject).then((res) => {
+                            setTimeout(() => {
+                                if (res.data.code === 200) {
+                                    message.success(res.data.message)
+                                    selectBrand({
+                                        page: 1,
+                                        size: pagination.value.pageSize
+                                    })
+                                } else {
+                                    message.error(res.data.message)
+                                }
+                            }, 1000)
+                        })
+                        //重置表单
+                        formRef.value?.resetFields();
 
-                confirmLoading.value = true;
-                axios.post('http://localhost:8082/brand-ms/deleteBrand/addBrand', brandObject).then((res) => {
-                    setTimeout(() => {
-                        if (res.data.code === 200) {
-                            message.success(res.data.message)
-                            selectBrand({
-                                page: 1,
-                                size: pagination.value.pageSize
-                            })
-                        } else {
-                            message.error(res.data.message)
-                        }
-                    }, 1000)
-                    confirmLoading.value = false
-                    visible.value = false
-                })
+                        confirmLoading.value = false
+                        visible.value = false
+                    })
             };
 
             return {

@@ -29,13 +29,23 @@ public class BrandServiceImpl implements BrandService {
 	private TbBrandMapper brandMapper;
 
 	/**
+	 * 添加品牌
+	 *
+	 * @param brand
+	 */
+	@Override
+	public void addBrand(TbBrand brand) {
+		brandMapper.insert(brand);
+	}
+
+	/**
 	 * 根据id批量删除
 	 *
 	 * @param idList
 	 */
 	@Override
 	public void deleteByIdList(ArrayList<Long> idList) {
-		idList.forEach(id->brandMapper.deleteByPrimaryKey(id));
+		idList.forEach(id -> brandMapper.deleteByPrimaryKey(id));
 	}
 
 	/**

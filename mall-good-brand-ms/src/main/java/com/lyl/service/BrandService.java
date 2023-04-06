@@ -28,4 +28,11 @@ public interface BrandService {
 	 * @param idList
 	 */
 	void deleteByIdList(ArrayList<Long> idList);
+
+	/**
+	 * 添加品牌
+	 *
+	 * @param brand
+	 */
+	void addBrand(TbBrand brand);
 }
