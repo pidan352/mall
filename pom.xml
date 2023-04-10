@@ -14,6 +14,7 @@
         <module>mall-eureka</module>
         <module>mall-zuul</module>
         <module>mall-good-brand-ms</module>
+        <module>oss-test</module>
     </modules>
 
     <parent>
