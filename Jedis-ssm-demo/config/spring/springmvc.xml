@@ -28,8 +28,8 @@
 	</bean>
 	
 	<!-- 扫描controller包 -->
-	<context:component-scan base-package="controller"></context:component-scan>
-	
+<!--	<context:component-scan base-package="controller"></context:component-scan>-->
+
 	<!-- 视图解析器 -->
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
