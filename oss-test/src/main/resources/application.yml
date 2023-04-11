@@ -1,0 +1,8 @@
+# OSS对象存储相关配置
+oss:
+  bucketName: oss-text1 # 存储桶名字
+  endpoint: https://oss-cn-hangzhou.aliyuncs.com #桶所在节点ip
+  #不上传每次commit都有yml文件，把这两个key删了再push
+  accessKey:  #登录账号
+  secretKey: #密码
+  bucketEndpoint: https://oss-text1.oss-cn-hangzhou.aliyuncs.com
