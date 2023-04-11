@@ -42,7 +42,7 @@
                     :locale="{emptyText:errormessage}"
             >
                 <template #bodyCell="{ column, text, record }">
-                    <template v-if="['category_id','title','url','pic','status','sort_order'].includes(column.dataIndex)">
+                    <template v-if="['category_id','title','url','status','sort_order'].includes(column.dataIndex)">
                         <div>
                             <a-input
                                     v-if="editableData[record.key]"
@@ -52,6 +52,14 @@
                             <template v-else>
                                 {{ text }}
                             </template>
+                        </div>
+                    </template>
+
+                    <template v-else-if="column.dataIndex === 'pic'">
+                        <div class="editable-row-operations">
+                            <div>
+                                <img :src="record.pic" style="width: 300px;height: 120px">
+                            </div>
                         </div>
                     </template>
 
