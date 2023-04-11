@@ -27,6 +27,9 @@ import java.util.Date;
 @CrossOrigin("*")
 public class UploadFileDemo {
 
+	/**
+	 * 从application.yml中读取，但是为了安全不能上传oss的key，所以不上传application.yml
+	 */
 	@Value("${oss.bucketName}")
 	private String bucketName;
 
