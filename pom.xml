@@ -15,6 +15,7 @@
         <module>mall-zuul</module>
         <module>mall-good-brand-ms</module>
         <module>oss-test</module>
+        <module>mall-content-ms</module>
     </modules>
 
     <parent>

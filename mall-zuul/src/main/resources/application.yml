@@ -13,6 +13,9 @@ zuul:
     api-brand:
       path: /brand-ms/**
       service-id: mall-good-brand-ms
+    api-content:
+      path: /content-ms/**
+      service-id: mall-content-ms
 
 spring:
   application:

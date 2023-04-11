@@ -1,0 +1,42 @@
+eureka:
+  client:
+    service-url:
+      # eureka的地址
+      defaultZone: http://localhost:8081/eureka/
+
+server:
+  port: 8084
+
+spring:
+  application:
+    # 服务名
+    name: "mall-content-ms"
+  datasource:
+    url: "jdbc:mysql://localhost:3306/pinyougoudb?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai"
+    username: root
+    password:
+    # druid连接池
+    type: com.alibaba.druid.pool.DruidDataSource
+    #数据库驱动
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      max-active: 20
+      initial-size: 5
+      max-wait: 60000
+      min-idle: 5
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 180000
+      validation-query: select 'x'
+      validation-query-timeout: 1
+      test-on-borrow: false
+      test-while-idle: true
+      test-on-return: false
+      pool-prepared-statements: false
+      max-open-prepared-statements: 20
+      remove-abandoned-timeout: 1800
+      remove-abandoned: true
+
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
