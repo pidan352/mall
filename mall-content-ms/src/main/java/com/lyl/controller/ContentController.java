@@ -7,6 +7,7 @@ import com.lyl.service.ContentServie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 功能：
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @date 2023/4/11
  */
 
-@Controller
+@RestController
 public class ContentController {
 
 	@Autowired
