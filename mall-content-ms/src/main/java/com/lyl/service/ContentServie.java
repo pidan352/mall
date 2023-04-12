@@ -20,4 +20,14 @@ public interface ContentServie {
 	 * @return
 	 */
 	List<TbContent> queryContent();
+
+	/**
+	 * 小程序查找广告
+	 *
+	 * @param id
+	 * @return
+	 */
+	List<TbContent> findByCategoryId(Integer id);
+
+	//增删改的方法需要更新redis中的数据
 }

@@ -7,7 +7,10 @@ import com.lyl.service.ContentServie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 功能：
@@ -39,6 +42,17 @@ public class ContentController {
 			pageResp.setList(page.getResult());
 
 			return RespBean.ok("查询成功", pageResp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return RespBean.fail("数据查询出错");
+		}
+	}
+
+	@GetMapping("/findByCategoryId/{id}")
+	public RespBean findByCategoryId(@PathVariable Integer id) {
+		try {
+			List<TbContent> contentList = contentServie.findByCategoryId(id);
+			return RespBean.ok("查询成功", contentList);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return RespBean.fail("数据查询出错");
