@@ -11,6 +11,9 @@ spring:
   application:
     # 服务名
     name: "mall-content-ms"
+  redis:
+    host: 192.168.247.129
+    port: 6379
   datasource:
     url: "jdbc:mysql://localhost:3306/pinyougoudb?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai"
     username: root
