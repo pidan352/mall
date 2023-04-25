@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Main from '../views/Main.vue'
 import Brand from '../views/Brand.vue'
 import Content from '../views/Content.vue'
+import ContentCategory from "@/views/ContentCategory.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -34,6 +35,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/content',
         name: 'Content',
         component: Content,
+    },
+    {
+        path: '/contentCategory',
+        name: 'contentCategory',
+        component: ContentCategory,
     },
 ]
 

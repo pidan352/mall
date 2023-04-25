@@ -109,16 +109,59 @@
     >
         <a-form layout="vertical" name="form_in_modal" v-model:model="brandObject" ref="formRef">
             <a-form-item
-                    name="name"
-                    label="品牌名"
-                    :rules="[{ required: true, message: '请输入品牌名' }]"
-                    required="true"
+                    name="category_id"
+                    label="广告类别"
+                    :rules="[{ required: true, message: '请选择广告类别' }]"
             >
-                <a-input v-model:value="brandObject.name"/>
+                <!--
+                    getPopupContainer为了防止滚动时select与输入框分离的bug
+                    labelInValue使选中时返回值的类型变为{key:key,value:value,...}
+                 -->
+                <a-select v-model:value="brandObject.category_id"
+                          placeholder="请选择广告类别"
+                          :getPopupContainer="triggerNode => {
+                            return triggerNode.parentNode || document.body
+                            }"
+                          labelInValue
+                >
+                    <a-select-option v-for="(category) in categoryList"
+                                     :value="category.name"
+                                     v-bind:key="category.id">
+                    </a-select-option>
+                </a-select>
             </a-form-item>
-            <a-form-item name="firstChar" label="品牌名首字母"
-                         :rules="[{required:true,message:'请输入品牌首写字母'}]">
-                <a-input v-model:value="brandObject.firstChar"/>
+
+            <a-form-item name="title" label="标题">
+                <a-input v-model:value="brandObject.title"/>
+            </a-form-item>
+
+            <a-form-item name="url" label="链接">
+                <a-input v-model:value="brandObject.url"/>
+            </a-form-item>
+
+            <a-form-item name="pic" label="图片">
+                <a-upload
+                        v-model:file-list="brandObject.pic"
+                        action="http://localhost:8082/content-ms/uploadPic"
+                        list-type="picture-card"
+                        @preview="handlePreview"
+                >
+                    <div v-if="brandObject.pic.length < 1">
+                        <plus-outlined/>
+                        <div style="margin-top: 8px">Upload</div>
+                    </div>
+                </a-upload>
+                <a-modal :visible="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
+                    <img alt="example" style="width: 100%" :src="previewImage"/>
+                </a-modal>
+            </a-form-item>
+
+            <a-form-item name="status" label="状态">
+                <a-input v-model:value="brandObject.status"/>
+            </a-form-item>
+
+            <a-form-item name="sortOrder" label="排序">
+                <a-input v-model:value="brandObject.sortOrder"/>
             </a-form-item>
         </a-form>
     </a-modal>
@@ -128,8 +171,8 @@
     import axios from "axios";
     import {defineComponent, ref, onMounted, computed, reactive, toRefs, toRaw} from 'vue';
     import {message} from 'ant-design-vue';
-    import {QuestionCircleOutlined} from '@ant-design/icons-vue';
-    import type {FormInstance} from 'ant-design-vue';
+    import {QuestionCircleOutlined, PlusOutlined} from '@ant-design/icons-vue';
+    import type {FormInstance, UploadProps} from 'ant-design-vue';
     import type {UnwrapRef} from 'vue';
     import {cloneDeep} from 'lodash-es';
 
@@ -209,12 +252,17 @@
     interface content {
         //表示可以不用赋初值
         id?: number;
-        category_id: number;
+        category_id?: number;
         title: string;
         url: string;
         pic: string;
         status: number;
         sort_order: number;
+    }
+
+    interface category {
+        id?: number;
+        name: string;
     }
 
     //表格的数据源
@@ -236,25 +284,48 @@
     const confirmLoading = ref<boolean>(false);
     const formRef = ref<FormInstance>();
     //表单品牌对象
-    const brandObject = reactive<content>({
-        category_id: 1,
-        title: "",
-        url: "",
-        pic: "",
-        status: 1,
-        sort_order: 1
+    const brandObject = reactive<Record<string, any>>({
+        pic: []
     })
+
+    const categoryList = ref()
 
 
     //编辑表格单元行参数
     //编辑时复制一份数据
     const editableData: UnwrapRef<Record<string, content>> = reactive({});
 
+
+    //上传文件
+    //编码函数
+    function getBase64(file: File) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    const previewVisible = ref(false);
+    const previewImage = ref('');
+    const previewTitle = ref('');
+
+    // const fileList = ref<UploadProps['fileList']>([
+    //     // {
+    //     //     uid: '-1',
+    //     //     name: 'image.png',
+    //     //     status: 'done',
+    //     //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    //     // },
+    // ]);
+
     export default defineComponent({
         name: 'Content',
 
         components: {
             QuestionCircleOutlined,
+            PlusOutlined,
         },
 
 
@@ -345,30 +416,22 @@
 
                 //selectedRowKeys是一个Proxy代理对象，使用序列化的方法将其转化为数组类型
                 const idList: [number] = JSON.parse(JSON.stringify(state.selectedRowKeys))
-                // axios.post('http://localhost:8082/brand-ms/deleteBrand', idList).then((response) => {
-                //     if (response.data.code === 200) {
-                //         //删除完毕
-                //         setTimeout(() => {
-                //             state.loading2 = false;
-                //             state.selectedRowKeys = [];
-                //             selectBrand({
-                //                 page: 1,
-                //                 size: pagination.value.pageSize
-                //             })
-                //         }, 1000);
-                //         message.success(response.data.message)
-                //     } else {
-                //         message.error(response.data.message)
-                //     }
-                // })
-                setTimeout(() => {
-                    state.loading2 = false;
-                    state.selectedRowKeys = [];
-                    selectBrand({
-                        page: 1,
-                        size: pagination.value.pageSize
-                    })
-                }, 1000);
+                axios.post('http://localhost:8082/content-ms/deleteContent', idList).then((response) => {
+                    if (response.data.code === 200) {
+                        //删除完毕
+                        setTimeout(() => {
+                            state.loading2 = false;
+                            state.selectedRowKeys = [];
+                            selectBrand({
+                                page: 1,
+                                size: pagination.value.pageSize
+                            })
+                        }, 1000);
+                        message.success(response.data.message)
+                    } else {
+                        message.error(response.data.message)
+                    }
+                })
             };
             //复选框变动触发的函数
             const onSelectChange = (selectedRowKeys: Key[]) => {
@@ -386,35 +449,77 @@
 
             //弹出添加的窗口
             const showModal = () => {
+                //查询广告类别
+                axios.get("http://localhost:8082/content-ms/queryCategory")
+                    .then((res) => {
+                        if (res.data.code === 200) {
+                            const categoryArray = res.data.data
+                            const categoryData: category[] = []
+                            if (categoryArray.length > 0) {
+                                for (let i = 0; i < categoryArray.length; i++) {
+                                    categoryData.push({
+                                        id: categoryArray[i].id,
+                                        name: categoryArray[i].name,
+                                    })
+                                }
+                                categoryList.value = categoryData
+                            } else {
+                                categoryList.value = []
+                            }
+                        }
+                    })
                 visible.value = true;
             };
 
-            //添加窗口的确认事件
-            // const handleOk = () => {
-            //     //表单校验
-            //     formRef.value?.validateFields()
-            //         .then(values => {
-            //             confirmLoading.value = true;
-            //             axios.post('http://localhost:8082/brand-ms/addBrand', brandObject).then((res) => {
-            //                 setTimeout(() => {
-            //                     if (res.data.code === 200) {
-            //                         message.success(res.data.message)
-            //                         selectBrand({
-            //                             page: 1,
-            //                             size: pagination.value.pageSize
-            //                         })
-            //                     } else {
-            //                         message.error(res.data.message)
-            //                     }
-            //                 }, 1000)
-            //             })
-            //             //重置表单
-            //             formRef.value?.resetFields();
-            //
-            //             confirmLoading.value = false
-            //             visible.value = false
-            //         })
-            // };
+            //文件上传
+            //图片预览窗口关闭
+            const handleCancel = () => {
+                previewVisible.value = false;
+                previewTitle.value = '';
+            };
+            //点击预览图片
+            const handlePreview = async (file: any) => {
+                if (!file.url && !file.preview) {
+                    file.preview = (await getBase64(file.originFileObj)) as string;
+                }
+                previewImage.value = file.url || file.preview;
+                previewVisible.value = true;
+                previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
+            };
+
+            // 添加窗口的确认事件
+            const handleOk = () => {
+                //表单校验
+                formRef.value?.validateFields()
+                    .then(values => {
+                        //因为select选中返回的值的格式是对象，但是只需要key值，所以单独提取出来
+                        const form = cloneDeep(toRaw(brandObject))
+                        form.categoryId = toRaw(brandObject).category_id.key
+
+                        //将图片上传返回的url放入表单信息中
+                        form.pic = (toRaw(brandObject).pic)[0].response
+
+                        confirmLoading.value = true;
+                        axios.post('http://localhost:8082/content-ms/addContent', form).then((res) => {
+                            setTimeout(() => {
+                                if (res.data.code === 200) {
+                                    message.success(res.data.message)
+                                    selectBrand({
+                                        page: 1,
+                                        size: pagination.value.pageSize
+                                    })
+                                } else {
+                                    message.error(res.data.message)
+                                }
+                            }, 1000)
+                        })
+                        //重置表单
+                        formRef.value?.resetFields();
+
+                        confirmLoading.value = false
+                        visible.value = false
+                    })
+            };
 
 
             //编辑
@@ -460,7 +565,7 @@
                 visible,
                 confirmLoading,
                 showModal,
-                // handleOk,
+                handleOk,
                 brandObject,
                 formRef,
                 editingKey: '',
@@ -468,6 +573,13 @@
                 edit,
                 // save,
                 cancelEdit,
+                categoryList,
+                previewVisible,
+                previewImage,
+                // fileList,
+                handleCancel,
+                handlePreview,
+                previewTitle,
             };
         },
     });
@@ -483,6 +595,16 @@
 
     .editable-row-operations a {
         margin-right: 8px;
+    }
+
+    .ant-upload-select-picture-card i {
+        font-size: 32px;
+        color: #999;
+    }
+
+    .ant-upload-select-picture-card .ant-upload-text {
+        margin-top: 8px;
+        color: #666;
     }
 
 </style>

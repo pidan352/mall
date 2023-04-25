@@ -2,6 +2,7 @@ package com.lyl.service;
 
 import com.lyl.pojo.TbContent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,4 +31,18 @@ public interface ContentServie {
 	List<TbContent> findByCategoryId(Integer id);
 
 	//增删改的方法需要更新redis中的数据
+
+	/**
+	 * 删除
+	 *
+	 * @param idList
+	 */
+	void deleteByIdList(ArrayList<Long> idList);
+
+	/**
+	 * 添加
+	 *
+	 * @param content
+	 */
+	void insert(TbContent content);
 }

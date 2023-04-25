@@ -35,7 +35,9 @@
                 <template #title>
                     <span><notification-outlined/>广告管理</span>
                 </template>
-                <a-menu-item key="8">广告类别</a-menu-item>
+                <a-menu-item key="8">
+                    <router-link to="/contentCategory"> 广告类别</router-link>
+                </a-menu-item>
                 <a-menu-item key="9">
                     <router-link to="/content">广告内容</router-link>
                 </a-menu-item>

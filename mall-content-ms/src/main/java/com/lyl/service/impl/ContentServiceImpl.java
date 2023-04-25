@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +28,22 @@ public class ContentServiceImpl implements ContentServie {
 
 	@Resource
 	private RedisTemplate redisTemplate;
+
+
+	@Override
+	public void insert(TbContent content) {
+		contentMapper.insert(content);
+	}
+
+	/**
+	 * 根据idList删除广告数据
+	 *
+	 * @param idList
+	 */
+	@Override
+	public void deleteByIdList(ArrayList<Long> idList) {
+		idList.forEach(id -> contentMapper.deleteByPrimaryKey(id));
+	}
 
 	/**
 	 * 小程序查询广告内容
@@ -56,8 +73,11 @@ public class ContentServiceImpl implements ContentServie {
 			contentExample.setOrderByClause("sort_order");
 
 			list = contentMapper.selectByExample(contentExample);
+			System.out.println("从数据库中查询");
 
 			redisTemplate.opsForHash().put("content", id, list);
+		} else {
+			System.out.println("从redis中取数据");
 		}
 		return list;
 	}
