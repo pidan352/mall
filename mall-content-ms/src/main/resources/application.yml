@@ -7,6 +7,14 @@ eureka:
 server:
   port: 8084
 
+oss:
+  bucketName: oss-text1 # 存储桶名字
+  endpoint: https://oss-cn-hangzhou.aliyuncs.com #桶所在节点ip
+  #不上传每次commit都有yml文件，把这两个key删了再push
+  accessKey:
+  secretKey:
+  bucketEndpoint: https://oss-text1.oss-cn-hangzhou.aliyuncs.com
+
 spring:
   application:
     # 服务名
