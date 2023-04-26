@@ -42,7 +42,7 @@
                     :locale="{emptyText:errormessage}"
             >
                 <template #bodyCell="{ column, text, record }">
-                    <template v-if="['category_id','title','url','status','sort_order'].includes(column.dataIndex)">
+                    <template v-if="['categoryId','title','url','status','sortOrder'].includes(column.dataIndex)">
                         <div>
                             <a-input
                                     v-if="editableData[record.key]"
@@ -104,12 +104,13 @@
             title="添加品牌"
             :confirm-loading="confirmLoading"
             @ok="handleOk"
+            @cancel="modelCancel"
             cancel-text="取消"
             ok-text="添加"
     >
         <a-form layout="vertical" name="form_in_modal" v-model:model="brandObject" ref="formRef">
             <a-form-item
-                    name="category_id"
+                    name="categoryId"
                     label="广告类别"
                     :rules="[{ required: true, message: '请选择广告类别' }]"
             >
@@ -117,7 +118,7 @@
                     getPopupContainer为了防止滚动时select与输入框分离的bug
                     labelInValue使选中时返回值的类型变为{key:key,value:value,...}
                  -->
-                <a-select v-model:value="brandObject.category_id"
+                <a-select v-model:value="brandObject.categoryId"
                           placeholder="请选择广告类别"
                           :getPopupContainer="triggerNode => {
                             return triggerNode.parentNode || document.body
@@ -161,7 +162,7 @@
             </a-form-item>
 
             <a-form-item name="sortOrder" label="排序">
-                <a-input v-model:value="brandObject.sortOrder"/>
+                <a-input v-model:value="brandObject.sortOrder" placeholder="input number"/>
             </a-form-item>
         </a-form>
     </a-modal>
@@ -169,7 +170,7 @@
 
 <script lang="ts">
     import axios from "axios";
-    import {defineComponent, ref, onMounted, computed, reactive, toRefs, toRaw} from 'vue';
+    import {defineComponent, ref, onMounted, computed, reactive, toRefs, toRaw, watch} from 'vue';
     import {message} from 'ant-design-vue';
     import {QuestionCircleOutlined, PlusOutlined} from '@ant-design/icons-vue';
     import type {FormInstance, UploadProps} from 'ant-design-vue';
@@ -187,12 +188,12 @@
         {
             title: '编号',
             //列数据在数据项中对应的路径，支持通过数组查询嵌套路径。有了dataIndex可以将key忽略
-            dataIndex: 'id',
+            dataIndex: 'key',
             width: '5%'
         },
         {
             title: '类别id',
-            dataIndex: 'category_id',
+            dataIndex: 'categoryId',
             width: '5%',
         },
         {
@@ -208,17 +209,17 @@
         {
             title: '图片',
             dataIndex: 'pic',
-            width: '30%'
+            width: '20%'
         },
         {
             title: '状态',
             dataIndex: 'status',
-            width: '5%'
+            width: '10%'
         },
         {
             title: '排序',
-            dataIndex: 'sort_order',
-            width: '5%'
+            dataIndex: 'sortOrder',
+            width: '10%'
         },
         {
             title: '操作',
@@ -239,25 +240,25 @@
     type Key = string | number;
 
     interface DataType {
-        key: Key;
         id: number;
-        category_id: number;
+        key: Key;
+        categoryId: number;
         title: string;
         url: string;
         pic: string;
         status: number;
-        sort_order: number;
+        sortOrder: number;
     }
 
     interface content {
         //表示可以不用赋初值
         id?: number;
-        category_id?: number;
+        categoryId?: number;
         title: string;
         url: string;
         pic: string;
         status: number;
-        sort_order: number;
+        sortOrder: number;
     }
 
     interface category {
@@ -293,7 +294,7 @@
 
     //编辑表格单元行参数
     //编辑时复制一份数据
-    const editableData: UnwrapRef<Record<string, content>> = reactive({});
+    const editableData: UnwrapRef<Record<string, any>> = reactive({});
 
 
     //上传文件
@@ -319,6 +320,7 @@
     //     //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
     //     // },
     // ]);
+
 
     export default defineComponent({
         name: 'Content',
@@ -354,15 +356,15 @@
                             for (let i = 0; i < contentArray.length; i++) {
                                 dataSource.push({
                                     //商品在数据库的id作为复选框的行标志
-                                    key: contentArray[i].id,
+                                    id: contentArray[i].id,
                                     //因为每次只查五条数据，所以需要计算编号
-                                    id: (params.page - 1) * params.size + i + 1,
-                                    category_id: contentArray[i].categoryId,
+                                    key: (params.page - 1) * params.size + i + 1,
+                                    categoryId: contentArray[i].categoryId,
                                     title: contentArray[i].title,
                                     url: contentArray[i].url,
                                     pic: contentArray[i].pic,
                                     status: contentArray[i].status,
-                                    sort_order: contentArray[i].sortOrder
+                                    sortOrder: contentArray[i].sortOrder
                                 });
                             }
                             data.value = dataSource
@@ -422,12 +424,12 @@
                         setTimeout(() => {
                             state.loading2 = false;
                             state.selectedRowKeys = [];
+                            message.success(response.data.message)
                             selectBrand({
                                 page: 1,
                                 size: pagination.value.pageSize
                             })
                         }, 1000);
-                        message.success(response.data.message)
                     } else {
                         message.error(response.data.message)
                     }
@@ -471,7 +473,6 @@
                 visible.value = true;
             };
 
-            //文件上传
             //图片预览窗口关闭
             const handleCancel = () => {
                 previewVisible.value = false;
@@ -494,10 +495,15 @@
                     .then(values => {
                         //因为select选中返回的值的格式是对象，但是只需要key值，所以单独提取出来
                         const form = cloneDeep(toRaw(brandObject))
-                        form.categoryId = toRaw(brandObject).category_id.key
+                        form.categoryId = toRaw(brandObject).categoryId.key
 
                         //将图片上传返回的url放入表单信息中
-                        form.pic = (toRaw(brandObject).pic)[0].response
+                        if (toRaw(brandObject).pic.length > 0) {
+                            form.pic = (toRaw(brandObject).pic)[0].response
+                        } else {
+                            form.pic = ''
+                        }
+
 
                         confirmLoading.value = true;
                         axios.post('http://localhost:8082/content-ms/addContent', form).then((res) => {
@@ -512,6 +518,8 @@
                                     message.error(res.data.message)
                                 }
                             }, 1000)
+                        }).catch(() => {
+                            message.error('表单信息有误')
                         })
                         //重置表单
                         formRef.value?.resetFields();
@@ -520,6 +528,12 @@
                         visible.value = false
                     })
             };
+
+            //添加窗口的取消事件
+            const modelCancel = () => {
+                //重置表单
+                formRef.value?.resetFields();
+            }
 
 
             //编辑
@@ -530,18 +544,18 @@
 
             //因为385行需要在请求完成之后执行所以需要将axios请求改为同步（默认是异步）,只需将请求使用await修饰并将
             //请求所在的函数用async修饰即可
-            // const save = async (key: string) => {
-            //     await axios.post("http://localhost:8082/brand-ms/editBrand", editableData[key])
-            //         .then((res) => {
-            //             if (res.data.code === 200) {
-            //                 //编辑成功，将编辑后的数据合并到源数据中
-            //                 Object.assign(data.value.filter((item: { key: string; }) => key === item.key)[0], editableData[key]);
-            //             } else {
-            //                 message.error(res.data.message)
-            //             }
-            //         })
-            //     delete editableData[key];
-            // };
+            const save = async (key: string) => {
+                await axios.post("http://localhost:8082/content-ms/editContent", editableData[key])
+                    .then((res) => {
+                        if (res.data.code === 200) {
+                            //编辑成功，将编辑后的数据合并到源数据中
+                            Object.assign(data.value.filter((item: { key: string; }) => key === item.key)[0], editableData[key]);
+                        } else {
+                            message.error(res.data.message)
+                        }
+                    })
+                delete editableData[key];
+            };
 
             const cancelEdit = (key: string) => {
                 delete editableData[key];
@@ -566,12 +580,13 @@
                 confirmLoading,
                 showModal,
                 handleOk,
+                modelCancel,
                 brandObject,
                 formRef,
                 editingKey: '',
                 editableData,
                 edit,
-                // save,
+                save,
                 cancelEdit,
                 categoryList,
                 previewVisible,

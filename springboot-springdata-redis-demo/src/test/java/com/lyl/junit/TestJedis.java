@@ -1,7 +1,7 @@
 package com.lyl.junit;
 
-import com.lyl.App;
 import com.lyl.pojo.Person;
+import com.lyl.pojo.TbContent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,20 +75,21 @@ public class TestJedis {
 		ArrayList<String> userList = new ArrayList<>();
 		userList.add("zhansan");
 		userList.add("lisi");
-
-		ArrayList<String> fruitList = new ArrayList<>();
-		fruitList.add("apple");
-		fruitList.add("banana");
+		userList.add("wangwu");
 
 		redisTemplate.opsForHash().put("list", "userList", userList);
-		redisTemplate.opsForHash().put("list", "fruitList", fruitList);
 
 	}
 
 	@Test
 	public void testGetHash() {
-		List<String> userList = (List<String>) redisTemplate.opsForHash().get("list", "fruitList");
+		List<TbContent> userList = (List<TbContent>) redisTemplate.opsForHash().get("content", 1);
 		userList.forEach(System.out::println);
+	}
+
+	@Test
+	public void testDeleteHash() {
+		redisTemplate.opsForHash().delete("content", 1);
 	}
 
 

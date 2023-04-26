@@ -172,13 +172,23 @@ public class ContentController {
 
 	@PostMapping("/addContent")
 	public RespBean addContent(@RequestBody TbContent content) {
-		System.out.println(content);
 		try {
 			contentServie.insert(content);
 			return RespBean.ok("添加成功");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return RespBean.fail("添加失败");
+		}
+	}
+
+	@PostMapping("/editContent")
+	public RespBean editContent(@RequestBody TbContent content) {
+		try {
+			contentServie.updateById(content);
+			return RespBean.ok("修改成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return RespBean.fail("修改失败");
 		}
 	}
 }

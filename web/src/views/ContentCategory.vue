@@ -1,86 +1,93 @@
 <template>
-    <div class="clearfix">
-        <a-upload
-                v-model:file-list="fileList"
-                action="http://localhost:8082/content-ms/uploadPic"
-                list-type="picture-card"
-                @preview="handlePreview"
-        >
-            <div v-if="fileList.length < 8">
-                <plus-outlined/>
-                <div style="margin-top: 8px">Upload</div>
-            </div>
-        </a-upload>
-        <a-modal :visible="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
-            <img alt="example" style="width: 100%" :src="previewImage"/>
-        </a-modal>
-    </div>
+    <a-tooltip :trigger="['focus']" placement="topLeft" overlay-class-name="numeric-input">
+        <template v-if="inputValue" #title>
+      <span class="numeric-input-title">
+        {{ formatValue }}
+      </span>
+        </template>
+
+        <a-input
+                v-model:value="brandObject.sortOrder"
+                placeholder="Input a number"
+                :max-length="25"
+                style="width: 120px"
+                @blur="onBlur"
+        />
+    </a-tooltip>
 </template>
 <script lang="ts">
-    import {PlusOutlined} from '@ant-design/icons-vue';
-    import {defineComponent, ref} from 'vue';
-    import type {UploadProps} from 'ant-design-vue';
+    import {computed, defineComponent, reactive, ref, watch} from 'vue';
 
-    function getBase64(file: File) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
+    const brandObject = reactive<Record<string, any>>({})
+
+    function formatNumber(value: string) {
+        value += '';
+        const list = value.split('.');
+        const prefix = list[0].charAt(0) === '-' ? '-' : '';
+        let num = prefix ? list[0].slice(1) : list[0];
+        let result = '';
+
+        while (num.length > 3) {
+            result = `,${num.slice(-3)}${result}`;
+            num = num.slice(0, num.length - 3);
+        }
+
+        if (num) {
+            result = num + result;
+        }
+
+        return `${prefix}${result}${list[1] ? `.${list[1]}` : ''}`;
     }
 
     export default defineComponent({
-        components: {
-            PlusOutlined,
-        },
         setup() {
-            const previewVisible = ref(false);
-            const previewImage = ref('');
-            const previewTitle = ref('');
+            const formatValue = computed(() => {
+                if (brandObject.sortOrder === '-') return '-';
+                return formatNumber(brandObject.sortOrder);
+            });
 
-            const fileList = ref<UploadProps['fileList']>([
-                // {
-                //     uid: '-1',
-                //     name: 'image.png',
-                //     status: 'done',
-                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                // },
-            ]);
+            const format = (val: any, preVal: any) => {
+                const reg = /^-?\d*(\.\d*)?$/;
 
-            const handleCancel = () => {
-                previewVisible.value = false;
-                previewTitle.value = '';
-            };
-            const handlePreview = async (file: any) => {
-                if (!file.url && !file.preview) {
-                    file.preview = (await getBase64(file.originFileObj)) as string;
+                if ((!isNaN(+val) && reg.test(val)) || val === '' || val === '-') {
+                    brandObject.sortOrder.value = val;
+                } else {
+                    brandObject.sortOrder.value = preVal;
                 }
-                previewImage.value = file.url || file.preview;
-                previewVisible.value = true;
-                previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
             };
+
+            // '.' at the end or only '-' in the input box.
+            const onBlur = () => {
+                if (
+                    brandObject.sortOrder.charAt(brandObject.sortOrder.length - 1) === '.' ||
+                    brandObject.sortOrder === '-'
+                ) {
+                    format(brandObject.sortOrder.slice(0, -1), brandObject.sortOrder);
+                }
+            };
+
+            watch(brandObject.sortOrder, (val, preVal) => {
+                format(val, preVal);
+            });
 
             return {
-                previewVisible,
-                previewImage,
-                fileList,
-                handleCancel,
-                handlePreview,
-                previewTitle,
+                // inputValue,
+                onBlur,
+                formatValue,
+                brandObject,
             };
         },
     });
 </script>
 <style>
-    /* you can make up upload button and sample style by using stylesheets */
-    .ant-upload-select-picture-card i {
-        font-size: 32px;
-        color: #999;
+    /* to prevent the arrow overflow the popup container,
+    or the height is not enough when content is empty */
+    .numeric-input .ant-tooltip-inner {
+        min-width: 32px;
+        min-height: 37px;
     }
 
-    .ant-upload-select-picture-card .ant-upload-text {
-        margin-top: 8px;
-        color: #666;
+    .numeric-input .numeric-input-title {
+        font-size: 14px;
     }
 </style>

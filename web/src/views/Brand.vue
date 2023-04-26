@@ -96,6 +96,7 @@
             title="添加品牌"
             :confirm-loading="confirmLoading"
             @ok="handleOk"
+            @cancel="handleCancel"
             cancel-text="取消"
             ok-text="添加"
     >
@@ -136,7 +137,7 @@
         {
             title: '编号',
             //列数据在数据项中对应的路径，支持通过数组查询嵌套路径。有了dataIndex可以将key忽略
-            dataIndex: 'id',
+            dataIndex: 'key',
             width: '20%'
         },
         {
@@ -168,8 +169,8 @@
     type Key = string | number;
 
     interface DataType {
-        key: Key;
         id: number;
+        key: Key;
         name: string;
         firstChar: string;
     }
@@ -243,9 +244,9 @@
                             for (let i = 0; i < brandArray.length; i++) {
                                 dataSource.push({
                                     //商品在数据库的id作为复选框的行标志
-                                    key: brandArray[i].id,
+                                    id: brandArray[i].id,
                                     //因为每次只查五条数据，所以需要计算编号
-                                    id: (params.page - 1) * params.size + i + 1,
+                                    key: (params.page - 1) * params.size + i + 1,
                                     name: brandArray[i].name,
                                     firstChar: brandArray[i].firstChar,
                                 });
@@ -307,12 +308,12 @@
                         setTimeout(() => {
                             state.loading2 = false;
                             state.selectedRowKeys = [];
+                            message.success(response.data.message)
                             selectBrand({
                                 page: 1,
                                 size: pagination.value.pageSize
                             })
                         }, 1000);
-                        message.success(response.data.message)
                     } else {
                         message.error(response.data.message)
                     }
@@ -364,6 +365,12 @@
                     })
             };
 
+            //添加窗口的取消事件
+            const handleCancel = () => {
+                //重置表单
+                formRef.value?.resetFields();
+            }
+
 
             //编辑
             const edit = (key: string) => {
@@ -409,6 +416,7 @@
                 confirmLoading,
                 showModal,
                 handleOk,
+                handleCancel,
                 brandObject,
                 formRef,
                 editingKey: '',

@@ -26,13 +26,21 @@ public class ContentServiceImpl implements ContentServie {
 	@Resource
 	private TbContentMapper contentMapper;
 
-	@Resource
+	@Autowired
 	private RedisTemplate redisTemplate;
 
+	//增删改的方法需要更新redis中的数据
 
 	@Override
 	public void insert(TbContent content) {
 		contentMapper.insert(content);
+		redisTemplate.opsForHash().delete("content", content.getCategoryId().intValue());
+	}
+
+	@Override
+	public void updateById(TbContent content) {
+		contentMapper.updateByPrimaryKey(content);
+		redisTemplate.opsForHash().delete("content", content.getCategoryId().intValue());
 	}
 
 	/**
@@ -42,7 +50,12 @@ public class ContentServiceImpl implements ContentServie {
 	 */
 	@Override
 	public void deleteByIdList(ArrayList<Long> idList) {
-		idList.forEach(id -> contentMapper.deleteByPrimaryKey(id));
+		idList.forEach(id -> {
+			TbContent tbContent = contentMapper.selectByPrimaryKey(id);
+			redisTemplate.opsForHash().delete("content", tbContent.getCategoryId().intValue());
+			contentMapper.deleteByPrimaryKey(id);
+		});
+
 	}
 
 	/**
@@ -60,7 +73,7 @@ public class ContentServiceImpl implements ContentServie {
 	public List<TbContent> findByCategoryId(Integer id) {
 
 		//尝试从redis缓存中取出数据
-		List<TbContent> list = (List<TbContent>) redisTemplate.opsForHash().get("content", id);
+		ArrayList<TbContent> list = (ArrayList<TbContent>) redisTemplate.boundHashOps("content").get(id);
 
 		/**
 		 * 数据为空说明为首次加载，需要查询数据并存到redis
@@ -72,7 +85,7 @@ public class ContentServiceImpl implements ContentServie {
 			criteria.andCategoryIdEqualTo(id.longValue()).andStatusEqualTo("1");
 			contentExample.setOrderByClause("sort_order");
 
-			list = contentMapper.selectByExample(contentExample);
+			list = (ArrayList<TbContent>) contentMapper.selectByExample(contentExample);
 			System.out.println("从数据库中查询");
 
 			redisTemplate.opsForHash().put("content", id, list);

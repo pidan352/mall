@@ -45,4 +45,11 @@ public interface ContentServie {
 	 * @param content
 	 */
 	void insert(TbContent content);
+
+	/**
+	 * 更新编辑
+	 *
+	 * @param content
+	 */
+	void updateById(TbContent content);
 }
