@@ -56,9 +56,10 @@
                     </template>
 
                     <template v-else-if="column.dataIndex === 'pic'">
-                        <div class="editable-row-operations">
-                            <div>
-                                <img :src="record.pic" style="width: 300px;height: 120px">
+                        <div class="editable-row-operations" style="width: 300px;height: 120px">
+                            <!--                            <div>-->
+                            <div :style="'background:url('+record.pic+') no-repeat center;background-size:contain;width: 100%;height: 100%;'">
+                                <!--<img :src="record.pic" style="object-fit:cover;width: 100%;height: 100%;">-->
                             </div>
                         </div>
                     </template>
