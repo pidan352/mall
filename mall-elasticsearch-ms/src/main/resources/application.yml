@@ -1,4 +1,14 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka/
+
+server:
+  port: 8085
+
 spring:
+  application:
+    name: 'mall-esitem-ms'
   datasource:
     url: "jdbc:mysql://localhost:3306/pinyougoudb?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai"
     username: root
@@ -6,3 +16,7 @@ spring:
   elasticsearch:
     rest:
       uris: http://192.168.247.129:9200
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true

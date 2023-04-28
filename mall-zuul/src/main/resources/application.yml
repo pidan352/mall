@@ -16,6 +16,9 @@ zuul:
     api-content:
       path: /content-ms/**
       service-id: mall-content-ms
+    api-esitem:
+      path: /esitem-ms/**
+      service-id: mall-esitem-ms
 
 spring:
   application:
