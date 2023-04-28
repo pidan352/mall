@@ -83,7 +83,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from tb_areas
     where id = #{id,jdbcType=INTEGER}
