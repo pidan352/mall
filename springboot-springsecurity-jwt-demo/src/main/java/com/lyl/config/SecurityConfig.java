@@ -6,6 +6,7 @@ import com.lyl.component.RestAuthorizationHandler;
 import com.lyl.filter.JwtAuthenticationFilter;
 import com.lyl.filter.JwtAuthorizationFilter;
 import com.lyl.pojo.SysUser;
+import com.lyl.service.SysUserService;
 import com.lyl.service.impl.SysUserServiceimpl;
 import com.lyl.utils.UserDetailImpl;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +38,7 @@ import java.util.Collection;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Resource
-	private SysUserServiceimpl userService;
+	private SysUserService userService;
 
 	//指定加密算法，在springsecurity的加密算法：BCrypt, 在springsecurity中密码必须要加密认证！
 	@Bean

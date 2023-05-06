@@ -45,12 +45,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			SysUser user = new ObjectMapper().readValue(request.getInputStream(), SysUser.class);
 			//执行认证
 			//UsernamePasswordAuthenticationToken参数：账号、密码、权限列表
-			return this.authenticationManager.authenticate(
+			return authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(user.getUsercode(), user.getPassword(),
 															new ArrayList<>()));
 		} catch (IOException e) {
 			e.printStackTrace();
-			return this.authenticationManager.authenticate(
+			return authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(null, null,
 															new ArrayList<>()));
 		}
