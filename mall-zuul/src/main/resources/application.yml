@@ -9,7 +9,7 @@ server:
 # 网关路由
 zuul:
   routes:
-  #可以定义多个路径，路径名：api-*
+    #可以定义多个路径，路径名：api-*
     api-brand:
       path: /brand-ms/**
       service-id: mall-good-brand-ms
@@ -19,6 +19,11 @@ zuul:
     api-esitem:
       path: /esitem-ms/**
       service-id: mall-esitem-ms
+    api-auth:
+      path: /doLogin
+      service-id: auth-center
+  #解决网关过滤敏感请求头的方法
+  sensitive-headers:
 
 spring:
   application:

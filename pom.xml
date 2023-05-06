@@ -17,6 +17,8 @@
         <module>oss-test</module>
         <module>mall-content-ms</module>
         <module>mall-elasticsearch-ms</module>
+        <module>mall-auth-center</module>
+        <module>mall-common</module>
     </modules>
 
     <parent>
