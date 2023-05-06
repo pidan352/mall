@@ -1,7 +1,7 @@
 package com.lyl.controller;
 
 
-import com.lyl.pojo.RespBean;
+import com.lyl.utils.CommonResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
 
 	@GetMapping("/hello")
-	public RespBean hello() {
-		return RespBean.ok("hello");
+	public CommonResult hello() {
+		return CommonResult.success("hello");
 	}
 }

@@ -30,11 +30,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	private AuthenticationManager authenticationManager;
 
-	private String url;
 
 	public JwtAuthenticationFilter(String url, AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
-		this.url = url;
+		setFilterProcessesUrl(url);
 	}
 
 	//用户认证
