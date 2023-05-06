@@ -47,8 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		//登录成功的回调
-		http.authorizeRequests()
-				.anyRequest().authenticated()//所有访问都需认证，认证不通过的跳转到登录页面，springsecurity有自带的默认登录页面
+		http.authorizeRequests().anyRequest().authenticated()//所有访问都需认证，认证不通过的跳转到登录页面，springsecurity有自带的默认登录页面
 				.and()
 				.formLogin()//表单验证登录
 				.usernameParameter("username")//默认就是username，下同
