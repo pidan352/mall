@@ -3,44 +3,45 @@ import Home from '../views/Home.vue'
 import Main from '../views/Main.vue'
 import Brand from '../views/Brand.vue'
 import Content from '../views/Content.vue'
-import ContentCategory from "@/views/ContentCategory.vue";
+import ContentCategory from "../views/ContentCategory.vue";
+import Login from "../views/Login.vue"
 
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
-        name: 'Home',
-        component: Home,
+        name: 'Login',
+        component: Login,
+    },
+    {
+        path: '/main',
+        name: 'Main',
+        component: Main,
+        redirect: '/main/home',
+        //二级路由不需要斜杠，浏览器路径显示为一级路径/二级路径
         children: [
             {
-                path: '/main',
-                name: 'Main',
-                component: Main
-            }
+                path: 'home',
+                name: 'Home',
+                component: Home,
+            },
+            {
+                path: 'brand',
+                name: 'Brand',
+                component: Brand,
+            },
+            {
+                path: 'content',
+                name: 'Content',
+                component: Content,
+            },
+            {
+                path: 'contentCategory',
+                name: 'contentCategory',
+                component: ContentCategory,
+            },
         ]
     },
-    {
-        path: '/about',
-        name: 'About',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-    },
-    {
-        path: '/brand',
-        name: 'Brand',
-        component: Brand,
-    },
-    {
-        path: '/content',
-        name: 'Content',
-        component: Content,
-    },
-    {
-        path: '/contentCategory',
-        name: 'contentCategory',
-        component: ContentCategory,
-    },
+
 ]
 
 const router = createRouter({

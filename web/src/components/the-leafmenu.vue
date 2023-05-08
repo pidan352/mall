@@ -22,7 +22,7 @@
                     <span><laptop-outlined/>商品管理</span>
                 </template>
                 <a-menu-item key="3">
-                    <router-link to="/brand">品牌管理</router-link>
+                    <router-link to="/main/brand">品牌管理</router-link>
                 </a-menu-item>
                 <a-menu-item key="4">规格管理</a-menu-item>
                 <a-menu-item key="5">模板管理</a-menu-item>
@@ -36,10 +36,10 @@
                     <span><notification-outlined/>广告管理</span>
                 </template>
                 <a-menu-item key="8">
-                    <router-link to="/contentCategory"> 广告类别</router-link>
+                    <router-link to="/main/contentCategory"> 广告类别</router-link>
                 </a-menu-item>
                 <a-menu-item key="9">
-                    <router-link to="/content">广告内容</router-link>
+                    <router-link to="/main/content">广告内容</router-link>
                 </a-menu-item>
             </a-sub-menu>
         </a-menu>

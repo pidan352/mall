@@ -1,27 +1,15 @@
 <template>
-    <a-layout>
-        <TheHeader/>
-        <a-layout>
-            <TheLeafMenu/>
-            <router-view/>
-        </a-layout>
-        <TheFooter/>
-    </a-layout>
+    <div id="app">
+        <router-view></router-view>
+    </div>
 </template>
 
 <script>
     import {defineComponent} from 'vue';
-    import TheHeader from '@/components/The-Header.vue'
-    import TheFooter from '@/components/the-footer.vue'
-    import TheLeafMenu from '@/components/the-leafmenu.vue'
 
     export default defineComponent({
         name: 'app',
-        components: {
-            TheHeader,
-            TheFooter,
-            TheLeafMenu,
-        }
+        components: {}
     });
 </script>
 

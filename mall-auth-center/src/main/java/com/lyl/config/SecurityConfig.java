@@ -4,7 +4,6 @@ package com.lyl.config;
 import com.lyl.component.RestAuthenticationEntryPoin;
 import com.lyl.component.RestAuthorizationHandler;
 import com.lyl.filter.JwtAuthenticationFilter;
-import com.lyl.filter.JwtAuthorizationFilter;
 import com.lyl.pojo.TbUser;
 import com.lyl.service.SysUserService;
 import com.lyl.utils.UserDetailImpl;

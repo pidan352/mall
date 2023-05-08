@@ -1,18 +1,28 @@
 <template>
-        <a-layout style="padding: 0 24px 24px">
-
-            <a-layout-content
-                    :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
-            >
-                Content
-            </a-layout-content>
+    <a-layout>
+        <TheHeader/>
+        <a-layout>
+            <TheLeafMenu/>
+            <router-view/>
         </a-layout>
+        <TheFooter/>
+    </a-layout>
 </template>
 
 <script>
-    export default {
-        name: "main"
-    }
+    import {defineComponent} from 'vue';
+    import TheHeader from '@/components/The-Header.vue'
+    import TheFooter from '@/components/the-footer.vue'
+    import TheLeafMenu from '@/components/the-leafmenu.vue'
+
+    export default defineComponent({
+        name: 'main',
+        components: {
+            TheHeader,
+            TheFooter,
+            TheLeafMenu,
+        },
+    });
 </script>
 
 <style scoped>
