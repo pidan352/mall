@@ -7,6 +7,7 @@
                 :label-col="{ span: 8 }"
                 :wrapper-col="{ span: 16 }"
                 autocomplete="off"
+                @finish="login"
         >
             <a-form-item
                     label="用户名"
@@ -27,22 +28,45 @@
             </a-form-item>
 
             <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
-                <a-button type="primary" html-type="submit" class="loginRemember">登录</a-button>
+                <a-button type="primary" html-type="submit" class="loginRemember" :loading="loading">登录</a-button>
             </a-form-item>
         </a-form>
     </div>
 </template>
 
-<script>
+<script lang="ts">
     import {defineComponent, ref,} from 'vue';
+    import axios from "axios";
+    import {message} from "ant-design-vue";
+    import router from "@/router";
+    import store from '@/store';
 
     export default defineComponent({
         name: "Login",
 
         setup() {
             const user = ref({})
+            const loading = ref(false)
+
+            const login = async (value: any) => {
+                loading.value = true
+                await axios.post('http://localhost:8082/doLogin', user.value).then((response) => {
+                    const data = response.data;
+                    console.log(data)
+                    if (data.code === 200) {
+                        message.success("登录成功！");
+                        store.commit("SET_TOKEN", data.data);
+                        router.push('/main');
+                    } else {
+                        message.error(data.message);
+                    }
+                });
+                loading.value = false
+            }
             return {
                 user,
+                login,
+                loading,
             }
         }
     })
