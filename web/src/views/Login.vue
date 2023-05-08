@@ -52,7 +52,6 @@
                 loading.value = true
                 await axios.post('http://localhost:8082/doLogin', user.value).then((response) => {
                     const data = response.data;
-                    console.log(data)
                     if (data.code === 200) {
                         message.success("登录成功！");
                         store.commit("SET_TOKEN", data.data);
